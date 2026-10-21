@@ -1,0 +1,293 @@
+import java.util.ArrayList;
+
+class Cliente {
+    private String nombre, documento;
+    private int edad;
+    private float total_compras;
+
+    public Cliente(String documento, int edad, String nombre, float total_compras) {
+        this.documento = documento;
+        this.edad = edad;
+        this.nombre = nombre;
+        this.total_compras = total_compras;
+    }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getDocumento() { return documento; }
+    public void setDocumento(String documento) { this.documento = documento; }
+
+    public int getEdad() { return edad; }
+    public void setEdad(int edad) { this.edad = edad; }
+
+    public float getTotal_compras() { return total_compras; }
+    public void setTotal_compras(float total_compras) { this.total_compras = total_compras; }
+
+    @Override
+    public String toString() {
+        return nombre + " (doc: " + documento + ", edad: " + edad
+                + ", compras: $" + total_compras + ")";
+    }
+}
+
+class Node<E> {
+    E value;
+    int key;
+    Node<E> left;
+    Node<E> right;
+
+    public Node() { }
+
+    public Node(E value) {
+        this.value = value;
+    }
+
+    public Node(int key) {
+        this.key = key;
+    }
+
+    public Node(int key, E value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public int getKey() { return key; }
+    public void setKey(int newKey) { key = newKey; }
+
+    public E getValue() { return value; }
+    public void setValue(E value) { this.value = value; }
+
+    public Node<E> getLeft() { return this.left; }
+    public Node<E> getRight() { return this.right; }
+
+    public void setLeft(Node<E> newLeft) { this.left = newLeft; }
+    public void setRight(Node<E> newRight) { this.right = newRight; }
+}
+
+class BinarySearchTree {
+    private Node root;
+
+    public BinarySearchTree() {
+        root = null;
+    }
+
+    public BinarySearchTree(Node root) {
+        this.root = root;
+    }
+
+    public Node getRoot() {
+        return root;
+    }
+
+    public void insertNode(Node newNode) {
+        root = insertRecursive(newNode, root);
+    }
+
+    public Node insertRecursive(Node nodeToInsert, Node rootNode) {
+        if (rootNode == null)
+            return nodeToInsert;
+
+        if (nodeToInsert.getKey() < rootNode.getKey())
+            rootNode.setLeft(insertRecursive(nodeToInsert, rootNode.getLeft()));
+        else
+            rootNode.setRight(insertRecursive(nodeToInsert, rootNode.getRight()));
+
+        return rootNode;
+    }
+
+    public boolean searchNodeRecursive(int key, Node rootNode) {
+        if (rootNode == null) return false;
+        if (rootNode.getKey() == key) return true;
+        if (rootNode.getKey() > key)
+            return searchNodeRecursive(key, rootNode.getLeft());
+        return searchNodeRecursive(key, rootNode.getRight());
+    }
+
+    public Node buscarNodo(int key, Node rootNode) {
+        if (rootNode == null) return null;
+        if (rootNode.getKey() == key) return rootNode;
+        if (rootNode.getKey() > key)
+            return buscarNodo(key, rootNode.getLeft());
+        return buscarNodo(key, rootNode.getRight());
+    }
+
+    public void InOrder(Node root) {
+        if (root == null) return;
+        InOrder(root.getLeft());
+        System.out.println("->" + root.getKey());
+        InOrder(root.getRight());
+    }
+
+    public void preOrder(Node root) {
+        if (root == null) return;
+        System.out.println("->" + root.getKey());
+        preOrder(root.getLeft());
+        preOrder(root.getRight());
+    }
+
+    public void posOrder(Node root) {
+        if (root == null) return;
+        posOrder(root.getLeft());
+        posOrder(root.getRight());
+        System.out.println("->" + root.getKey());
+    }
+
+    public ArrayList<Integer> getKeyList() {
+        ArrayList<Integer> keyList = new ArrayList<>();
+        getKeyListRecursive(root, keyList);
+        return keyList;
+    }
+
+    private void getKeyListRecursive(Node rootNode, ArrayList<Integer> keyList) {
+        if (rootNode == null) return;
+        getKeyListRecursive(rootNode.getLeft(), keyList);
+        keyList.add(rootNode.getKey());
+        getKeyListRecursive(rootNode.getRight(), keyList);
+    }
+
+    public ArrayList<Cliente> clientesAscendente() {
+        ArrayList<Cliente> lista = new ArrayList<>();
+        clientesAscendenteRecursive(root, lista);
+        return lista;
+    }
+
+    private void clientesAscendenteRecursive(Node rootNode, ArrayList<Cliente> lista) {
+        if (rootNode == null) return;
+        clientesAscendenteRecursive(rootNode.getLeft(), lista);
+        lista.add((Cliente) rootNode.getValue());
+        clientesAscendenteRecursive(rootNode.getRight(), lista);
+    }
+
+    public ArrayList<Cliente> mayoresN(int n) {
+        ArrayList<Cliente> lista = new ArrayList<>();
+        mayoresNRecursive(root, n, lista);
+        return lista;
+    }
+
+    private void mayoresNRecursive(Node rootNode, int n, ArrayList<Cliente> lista) {
+        if (rootNode == null || lista.size() >= n) return;
+
+        mayoresNRecursive(rootNode.getRight(), n, lista);
+
+        if (lista.size() < n) {
+            lista.add((Cliente) rootNode.getValue());
+            mayoresNRecursive(rootNode.getLeft(), n, lista);
+        }
+    }
+
+    public ArrayList<Cliente> clientesEnRango(int min, int max) {
+        ArrayList<Cliente> lista = new ArrayList<>();
+        clientesEnRangoRecursive(root, min, max, lista);
+        return lista;
+    }
+
+    private void clientesEnRangoRecursive(Node rootNode, int min, int max, ArrayList<Cliente> lista) {
+        if (rootNode == null) return;
+
+        if (rootNode.getKey() > min) {
+            clientesEnRangoRecursive(rootNode.getLeft(), min, max, lista);
+        }
+
+        if (rootNode.getKey() >= min && rootNode.getKey() <= max) {
+            lista.add((Cliente) rootNode.getValue());
+        }
+
+        if (rootNode.getKey() < max) {
+            clientesEnRangoRecursive(rootNode.getRight(), min, max, lista);
+        }
+    }
+
+    public Cliente minimo() {
+        if (root == null) return null;
+        Node current = root;
+        while (current.getLeft() != null) {
+            current = current.getLeft();
+        }
+        return (Cliente) current.getValue();
+    }
+
+    public Cliente maximo() {
+        if (root == null) return null;
+        Node current = root;
+        while (current.getRight() != null) {
+            current = current.getRight();
+        }
+        return (Cliente) current.getValue();
+    }
+
+    public int altura(Node rootNode) {
+        if (rootNode == null)
+            return -1;
+        int altIzq = altura(rootNode.getLeft());
+        int altDer = altura(rootNode.getRight());
+        return 1 + Math.max(altIzq, altDer);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Cliente[] clientes = {
+            new Cliente("1001", 34, "Ana Torres",     850000f),
+            new Cliente("1002", 28, "Luis Prado",     1200000f),
+            new Cliente("1003", 45, "Marta Ríos",     430000f),
+            new Cliente("1004", 28, "Camilo Vélez",   990000f),
+            new Cliente("1005", 52, "Sofía Mejía",    2100000f),
+            new Cliente("1006", 31, "Julián Ortiz",   670000f),
+            new Cliente("1007", 23, "Valentina Cruz", 310000f),
+            new Cliente("1008", 39, "Andrés Lozano",  1750000f),
+            new Cliente("1009", 34, "Paola Gil",      540000f)
+        };
+
+        BinarySearchTree arbolCompras = new BinarySearchTree();
+        BinarySearchTree arbolEdad = new BinarySearchTree();
+
+        for (Cliente c : clientes) {
+            arbolCompras.insertNode(new Node((int) c.getTotal_compras(), c));
+            arbolEdad.insertNode(new Node(c.getEdad(), c));
+        }
+
+        System.out.println("Clientes registrados: " + clientes.length);
+        System.out.println("Nodos en arbolCompras: " + arbolCompras.getKeyList().size());
+        System.out.println("Nodos en arbolEdad: " + arbolEdad.getKeyList().size());
+
+        System.out.println("\n== R1: clientes por compras (ascendente) ==");
+        for (Cliente c : arbolCompras.clientesAscendente()) {
+            System.out.println(c);
+        }
+
+        System.out.println("\n== R2: Top 3 compradores ==");
+        for (Cliente c : arbolCompras.mayoresN(3)) {
+            System.out.println(c);
+        }
+
+        System.out.println("\n== R3: clientes entre 25 y 35 años ==");
+        for (Cliente c : arbolEdad.clientesEnRango(25, 35)) {
+            System.out.println(c);
+        }
+
+        System.out.println("\n== R4: búsqueda por total de compras ==");
+        int buscado = 990000;
+        Node encontrado = arbolCompras.buscarNodo(buscado, arbolCompras.getRoot());
+        if (encontrado != null) {
+            System.out.println("Cliente encontrado: " + encontrado.getValue());
+        } else {
+            System.out.println("No existe un cliente con un total de compras de $" + buscado);
+        }
+
+        System.out.println("\n== R5: más joven y mayor ==");
+        System.out.println("Más joven: " + arbolEdad.minimo());
+        System.out.println("Mayor:     " + arbolEdad.maximo());
+
+        System.out.println("\n== Parte D: Prueba de Alturas y Forma ==");
+        BinarySearchTree arbolDegenerado = new BinarySearchTree();
+        int[] ord1 = {10, 20, 30, 40, 50, 60};
+        for (int k : ord1) arbolDegenerado.insertNode(new Node(k));
+        System.out.println("Altura árbol desbalanceado (10..60): " + arbolDegenerado.altura(arbolDegenerado.getRoot()));
+
+        BinarySearchTree arbolBalanceado = new BinarySearchTree();
+        int[] ord2 = {40, 20, 60, 10, 30, 50};
+        for (int k : ord2) arbolBalanceado.insertNode(new Node(k));
+        System.out.println("Altura árbol balanceado (40, 20, 60...): " + arbolBalanceado.altura(arbolBalanceado.getRoot()));
+    }
+}
